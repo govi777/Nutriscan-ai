@@ -1,63 +1,148 @@
-# 🥑 NutriScan AI - Your Smart Health Companion
+# 🥑 NutriScan AI — Smart Nutrition Analyzer
 
-**NutriScan AI** is an interactive, AI-powered web application that turns your food photos into detailed nutritional insights. Built with **Streamlit** and **Google Gemini Vision Pro**, it acts as your personal nutritionist and chef combined.
+An AI-powered web application that analyzes food photos and delivers instant nutritional insights, personalized recipes, and health tracking — all in one place.
 
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+Built with **Streamlit**, **Google Gemini Vision API**, and deployed on **Azure Container Instances** using **Docker**.
+
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 ![Gemini AI](https://img.shields.io/badge/Google%20Gemini%20AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)
-
-## ✨ Features
-
-### 📸 1. AI Food Scanner
-- **Instant Recognition:** Upload or snap a photo of any meal.
-- **Deep Analysis:** Detects calories, macros (Carbs, Protein, Fat).
-- **Good vs. Bad:** AI breaks down Health Benefits ✅ and Potential Risks ⚠️.
-- **Smart Tags:** Auto-generates diet tags (e.g., High Protein, Low Carb).
-
-### 👨‍🍳 2. Intelligent AI Chef
-- **Instant Recipes:** Don't know what to cook? The AI suggests 3 unique recipes based on the food you just scanned.
-- **Diet-Aware:** Recipes adjust based on your profile (Vegan, Keto, Paleo, etc.).
-
-### 📊 3. Health & Progress Tracker
-- **Interactive Dashboard:** Tracks your daily calorie intake vs. your BMR goal.
-- **Hydration Tracker:** Log your water intake (Cup/Bottle) to hit your daily liters.
-- **Burn-It-Off Calculator:** Tells you exactly how long you need to Walk 🚶, Run 🏃, or Bike 🚴 to burn off the food.
-
-### 👤 4. Personalized Profile
-- Calculates **BMI** and **BMR** based on Age, Gender, Height, and Activity Level.
-- Sets custom daily calorie goals automatically.
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
 
 ---
 
-## 🚀 How to Run Locally
+## 🚀 Live Demo
+> Deployed on Azure Container Instances  
+> **URL:** `http://nutriscan-ai.<region>.azurecontainer.io:8501`
 
-1. **Clone the repository**
-   ```bash
-   git clone [https://github.com/your-username/nutriscan-ai.git](https://github.com/your-username/nutriscan-ai.git)
-   cd nutriscan-ai
+---
 
-Install Dependencies
+## ✨ Features
+
+### 📸 AI Food Scanner
+- Upload or capture a food photo
+- Gemini Vision API detects calories, macros (Carbs, Protein, Fat)
+- Breaks down health benefits and potential risks
+- Interactive macro donut chart via Plotly
+- Text-to-speech food summary using gTTS
+
+### 👨‍🍳 AI Chef
+- Suggests 3 recipes based on the scanned food
+- Diet-aware: adapts to Balanced, Keto, or Vegan preferences
+
+### 📊 Health & Progress Tracker
+- Daily calorie intake vs BMR goal tracker
+- Hydration tracker (Cup / Bottle logging)
+- Burn-it-off calculator: Walk, Run, Bike minutes
+
+### 👤 Personalized Profile
+- BMI and BMR calculated using Mifflin-St Jeor formula
+- Custom daily calorie goals based on age, gender, weight, height, and activity level
+
+### 💬 AI Nutrition Chatbot
+- Context-aware chatbot powered by Gemini
+- Answers nutrition, diet, and digestion questions
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Streamlit |
+| AI Model | Google Gemini 2.5 Flash / Pro (auto-detects best available) |
+| Visualization | Plotly |
+| Audio | gTTS (Text-to-Speech) |
+| Containerization | Docker |
+| Cloud Deployment | Azure Container Instances + Azure Container Registry |
+
+---
+
+## 📁 Project Structure
+
+```
+nutriscan-ai/
+│
+├── main.py              # Main Streamlit application
+├── requirements.txt     # Python dependencies
+├── Dockerfile           # Docker container configuration
+└── README.md
+```
+
+---
+
+## ⚙️ Run Locally
+
+### Option 1 — Standard Python
+```bash
+# Clone the repo
+git clone https://github.com/your-username/nutriscan-ai.git
+cd nutriscan-ai
+
+# Install dependencies
 pip install -r requirements.txt
 
-Run the App
+# Run the app
 streamlit run main.py
+```
 
-Connect AI
-The app will open in your browser.
-Open the Sidebar.
-Paste your Google Gemini API Key (https://aistudio.google.com/app/api-keys).
-Click Link Key and start scanning!
+### Option 2 — Docker
+```bash
+# Build the image
+docker build -t nutriscan-ai .
 
-🛠️ Tech Stack
-Frontend: Streamlit (Python)
+# Run the container
+docker run -p 8501:8501 nutriscan-ai
+```
 
-AI Model: Google Gemini 2.5 Flash / Pro (Auto-Detects best available model)
+Open `http://localhost:8501` in your browser.
 
-Visualization: Plotly (Interactive Donut Charts)
+---
 
-Audio: gTTS (Text-to-Speech for accessibility)
+## ☁️ Azure Deployment
 
-📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+# Login to Azure
+az login
 
-Disclaimer: This is an AI-powered tool for educational and lifestyle purposes. Always consult a professional for medical advice.
+# Create resource group
+az group create --name nutriscan-rg --location eastus
+
+# Create Azure Container Registry
+az acr create --resource-group nutriscan-rg --name nutriscanaicr --sku Basic
+az acr login --name nutriscanaicr
+
+# Build and push Docker image
+docker tag nutriscan-ai nutriscanaicr.azurecr.io/nutriscan-ai:v1
+docker push nutriscanaicr.azurecr.io/nutriscan-ai:v1
+
+# Deploy to Azure Container Instance
+az acr update --name nutriscanaicr --admin-enabled true
+az container create --resource-group nutriscan-rg --name nutriscan-app \
+  --image nutriscanaicr.azurecr.io/nutriscan-ai:v1 \
+  --cpu 1 --memory 1 \
+  --registry-login-server nutriscanaicr.azurecr.io \
+  --registry-username nutriscanaicr \
+  --registry-password $(az acr credential show --name nutriscanaicr --query passwords[0].value -o tsv) \
+  --dns-name-label nutriscan-ai --ports 8501
+
+# Get live URL
+az container show --resource-group nutriscan-rg --name nutriscan-app --query ipAddress.fqdn -o tsv
+```
+
+---
+
+## 🔑 API Key Setup
+
+1. Get a free Gemini API key from: https://aistudio.google.com/app/api-keys
+2. Open the app in your browser
+3. In the sidebar, paste your API key and click **Link Key**
+4. The app auto-detects the best available Gemini model
+
+---
+
+## 📜 License
+This project is licensed under the MIT License.
+
+> **Disclaimer:** This is an AI-powered tool for educational and lifestyle purposes only. Always consult a healthcare professional for medical advice.
